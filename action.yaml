@@ -9,7 +9,7 @@ inputs:
     description: 'List of Docker containers to build and push, comma separated values'
     required: false
     default: ''
- publish:
+  publish:
    description: 'List of packages to publish, comma separated values'
    required: false
    default: ''
@@ -41,37 +41,38 @@ runs:
         fi
       shell: bash
 
-    - name: Build and Push Containers
-      if: ${{ inputs.containers != '' }}
-      run: |
-        for container in ${{ inputs.containers }}; do
-          # Add commands to build the container, e.g., with Nix or Docker
-          # You will need to integrate your container build logic here
+    # - name: Build and Push Containers
+    #   if: ${{ inputs.containers != '' }}
+    #   run: |
+    #     for container in ${{ inputs.containers }}; do
+    #       # Add commands to build the container, e.g., with Nix or Docker
+    #       # You will need to integrate your container build logic here
 
-          echo "::set-output name=version::$(date +'%Y%m%d-%H%M%S')-$(git rev-parse --short HEAD)"
-          docker build -t $container .
+    #       echo "::set-output name=version::$(date +'%Y%m%d-%H%M%S')-$(git rev-parse --short HEAD)"
+    #       docker build -t $container .
 
-          echo ${{ env.GHCR_REGISTRY }}/${{ github.repository }}:$container | xargs -n 1 docker tag $container
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            docker push ${{ env.GHCR_REGISTRY }}/${{ github.repository }}:$container
-          fi
-        done
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #       echo ${{ env.GHCR_REGISTRY }}/${{ github.repository }}:$container | xargs -n 1 docker tag $container
+    #       if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+    #         docker push ${{ env.GHCR_REGISTRY }}/${{ github.repository }}:$container
+    #       fi
+    #     done
+    #   shell: bash
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and Upload Package
-      run: |
-        for package in ${{ inputs.publish }}; do
-          nix build $package -o $package
-          tar -czf $package-result.tar.gz $package
-          outputs="$outputs $package-result.tar.gz"
-        done
-            echo "::set-output name=${package}_artifact::$package-result.tar.gz"
-      shell: bash
+    # - name: Build and Upload Package
+    #   run: |
+    #     outputs=""
+    #     for package in ${{ inputs.publish }}; do
+    #       nix build $package -o $package
+    #       tar -czf $package-result.tar.gz $package
+    #       outputs="$outputs $package-result.tar.gz"
+    #     done
+    #         echo "::set-output name=${package}_artifact::$package-result.tar.gz"
+    #   shell: bash
 
-    - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: built-packages
-          path: ${{ steps.build_packages.outputs.package_outputs }}
+    # - name: Upload Artifacts
+    #     uses: actions/upload-artifact@v2
+    #     with:
+    #       name: built-packages
+    #       path: ${{ steps.build_packages.outputs.package_outputs }}
