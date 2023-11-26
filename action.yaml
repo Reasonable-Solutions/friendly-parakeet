@@ -34,7 +34,7 @@ runs:
       run: |
         echo "# :rocket: NIX BUILDS :rocket:" >> $GITHUB_STEP_SUMMARY
         if [ -z "${{ inputs.packages }}" ]; then
-          nix build
+          nix build --out-link result-default
           echo "- Built the default package" >> $GITHUB_STEP_SUMMARY
         else
           for package in ${{ inputs.packages }}; do
@@ -48,4 +48,4 @@ runs:
       uses: actions/upload-artifact@v3
       with:
         name: built-packages
-        path: ./result
+        path: ./result-*
