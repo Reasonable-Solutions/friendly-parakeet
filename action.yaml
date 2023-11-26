@@ -20,11 +20,11 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Check Nix flake inputs
-      uses: DeterminateSystems/flake-checker-action@v4
-
     - name: Install Nix
       uses: DeterminateSystems/nix-installer-action@v3
+
+    - name: Check Nix flake inputs
+      uses: DeterminateSystems/flake-checker-action@v4
 
     - name: Nix Flake Check
       run: nix flake check
@@ -36,7 +36,7 @@ runs:
           nix build
         else
           for package in ${{ inputs.packages }}; do
-            nix build $package
+            nix build .#$package --out-link result-$package
           done
         fi
       shell: bash
@@ -71,8 +71,8 @@ runs:
     #         echo "::set-output name=${package}_artifact::$package-result.tar.gz"
     #   shell: bash
 
-    # - name: Upload Artifacts
-    #     uses: actions/upload-artifact@v2
-    #     with:
-    #       name: built-packages
-    #       path: ${{ steps.build_packages.outputs.package_outputs }}
+    - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: built-packages
+          path: result
