@@ -32,7 +32,7 @@ runs:
 
     - name: Build Packages
       run: |
-        echo ":rocket: NIX BUILDS :rocket:" >> $GITHUB_STEP_SUMMARY
+        echo "# :rocket: NIX BUILDS :rocket:" >> $GITHUB_STEP_SUMMARY
         if [ -z "${{ inputs.packages }}" ]; then
           nix build
           echo "- Built the default package" >> $GITHUB_STEP_SUMMARY
